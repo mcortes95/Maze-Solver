@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageDraw
 from collections import deque
 
 def maze_to_list(maze):
@@ -19,8 +19,8 @@ def maze_to_list(maze):
             elif maze.getpixel((x,y)) == white:
                 maze_width.append(0)
         maze_list.append(maze_width)
-    for x in range(15):
-        print(maze_list[x])
+    #for x in range(15):
+    #    print(maze_list[x])
     return maze_list
 
 def shortest_path(list_maze):
@@ -61,28 +61,35 @@ def find_neighbors(maze,node):
 
 def reconstruct_quickest_path(path):
     single_path=[path[-1][0]]
-    print(single_path)
+    #print(single_path)
     for x in range(len(path)-2,0,-1):
         #print(path[x][0],end=" ")
         #and distance of second index is one
         if single_path[-1][0] == path[x][0][0]:
-            single_path.append(path[x][0])
+            if single_path[-1][1]-path[x][0][1] is 1 or single_path[-1][1]-path[x][0][1] is -1:
+                single_path.append(path[x][0])
         elif single_path[-1][1] == path[x][0][1]:
-            single_path.append(path[x][0])
+            if single_path[-1][0]-path[x][0][0] is 1 or single_path[-1][0]-path[x][0][0] is -1:
+                single_path.append(path[x][0])
+    single_path.append(path[0][0])
     return single_path
+
+def draw_path(maze_image, path):
+    path_drawing=ImageDraw.Draw(maze_image)
+    for x in path:
+        print(x)
+        path_drawing.point([ x[1],x[0] ],(233,0,0,200))
+    height=maze_image.height
+    width=maze_image.width
+    largerimage=maze_image.resize((width*50,height*50))
+    largerimage.show()
 
 #maze_name=input("Enter the name of the maze: ")
 testmaze=Image.open("testmaze1.png")
 rgb=(testmaze.getpixel((1,0)))
-print(rgb)
 list_maze=maze_to_list(testmaze)
 path=(shortest_path(list_maze))
-#testmaze.show()
-#path_list=list(path.keys())
-#for x in range(len(path)-1,-1,-1):
-    #print(path[x][0],end="")
 print()
 quickest_path=reconstruct_quickest_path(path)
-print(quickest_path)
-#print(path_list)
-
+#print(quickest_path)
+draw_path(testmaze,quickest_path)
